@@ -75,7 +75,7 @@ const Gallery: React.FC = () => {
     }, 400); // Match transition duration
   };
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setShowImages(false); // Hide images before changing the page
     setTransitioning(true); // Start transition
     setPage(value);
