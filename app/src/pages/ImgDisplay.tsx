@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams} from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Box from '@mui/material/Box';
 
 interface ImageData {
@@ -16,7 +14,6 @@ interface ImageData {
 const ImgDisplay: React.FC = () => {
   const { imageSrc } = useParams<{ imageSrc: string }>(); // Extract imageSrc from the URL
   const [imageData, setImageData] = useState<ImageData | null>(null); // State to hold image data
-  const navigate = useNavigate(); // For navigation
 
   useEffect(() => {
     if (!imageSrc) return; // Handle the case where imageSrc might be undefined
@@ -33,14 +30,6 @@ const ImgDisplay: React.FC = () => {
       return parts[0];
     }
     return 'Unknown Photographer';
-  };
-
-  // Example function to navigate to the previous or next image
-  const navigateToImage = (direction: 'prev' | 'next') => {
-    // Implement logic to get the previous or next image based on `direction`
-    // For example:
-    // const newImageSrc = direction === 'prev' ? getPreviousImage(imageSrc) : getNextImage(imageSrc);
-    // navigate(`/img-display/${newImageSrc}`);
   };
 
   if (!imageData) return <Typography>Loading...</Typography>;
