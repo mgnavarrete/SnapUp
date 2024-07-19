@@ -59,12 +59,12 @@ const UploadImg: React.FC = () => {
       setOpen(true);
       return;
     }
-  
+
     if (selectedFiles.length > 0) {
       setOpen(true);
       setUploadMessage('Subiendo Imágenes, por favor espera...');
       setUploadProgress(0);
-  
+
       try {
         for (let i = 0; i < selectedFiles.length; i++) {
           await uploadFile(selectedFiles[i], i, selectedFiles.length);
@@ -78,14 +78,12 @@ const UploadImg: React.FC = () => {
       }
     }
   };
-  
+
   const uploadFile = async (file: File, index: number, totalFiles: number) => {
     const formData = new FormData();
     formData.append('images', file);
-    formData.append('photographerName', photographerName); // Asegúrate de que el nombre del fotógrafo se añada correctamente
-  
-    console.log("Photographer Name:", photographerName); // Agregar este log para verificar
-  
+    formData.append('photographerName', photographerName);
+
     const config: AxiosRequestConfig = {
       headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (progressEvent: AxiosProgressEvent) => {
@@ -95,7 +93,7 @@ const UploadImg: React.FC = () => {
         }
       }
     };
-  
+
     try {
       await axios.post('http://localhost:5000/upload', formData, config);
     } catch (error) {
@@ -198,7 +196,7 @@ const UploadImg: React.FC = () => {
       </Box>
 
       <BootstrapDialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
-        <DialogTitle sx={{ m: 0, p: 2, color:'#698474' }} id="customized-dialog-title">
+        <DialogTitle sx={{ m: 0, p: 2, color: '#698474' }} id="customized-dialog-title">
           Subiendo Imágenes
           <IconButton
             aria-label="close"
