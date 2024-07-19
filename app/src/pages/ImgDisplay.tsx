@@ -75,8 +75,8 @@ const ImgDisplay: React.FC = () => {
       >
 
         <Typography variant="body2" color="#FCF8F3">
-          <strong style={{ fontSize: '15px', color: '#FCF8F3' }}>Fotógrafo:</strong> 
-          <span style={{ fontSize: '15px', fontStyle: 'italic', color: '#FCF8F3' }}>{imageData.photographer}</span>
+          <strong style={{ fontSize: '15px', color: '#FCF8F3' }}>Fotógrafo: </strong> 
+          <span style={{ fontSize: '15px', fontStyle: 'italic', color: '#FCF8F3' }}> {imageData.photographer}</span>
         </Typography>
         <Button
           aria-label="download"
