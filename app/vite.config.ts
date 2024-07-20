@@ -9,12 +9,12 @@ export default defineConfig({
     host: true, // Esto permite que se pueda acceder desde una IP externa
     proxy: {
       '/api': {
-        target: 'mentaflix.ddns.net:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
       '/uploads': {
-        target: 'mentaflix.ddns.net/:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
