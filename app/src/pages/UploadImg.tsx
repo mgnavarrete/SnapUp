@@ -97,7 +97,7 @@ const UploadImg: React.FC = () => {
     };
   
     try {
-      await axios.post('http://localhost:5000/upload', formData, config);
+      await axios.post('mentaflix.ddns.net:5000/upload', formData, config);
     } catch (error) {
       console.error('Error subiendo las imágenes:', error);
       throw error;
