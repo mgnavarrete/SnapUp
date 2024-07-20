@@ -18,6 +18,9 @@ export const Navbar: React.FC = () => {
         <ListItem button component={Link} to="/">
           <ListItemText primary="SnapUp" />
         </ListItem>
+        <ListItem button component={Link} to="/slideshow">
+          <ListItemText primary="Slideshow" />
+        </ListItem>
         <ListItem button component={Link} to="/upload-img">
           <ListItemText primary="Subir Foto" />
         </ListItem>
@@ -25,8 +28,9 @@ export const Navbar: React.FC = () => {
           <ListItemText primary="Sacar Foto" />
         </ListItem>
         <ListItem button component={Link} to="/gallery">
-          <ListItemText primary="Ver Galería" />
+          <ListItemText primary="Galería" />
         </ListItem>
+        
       </List>
       <Box sx={{ p: 2, textAlign: 'center' }}>
         <Typography variant="body2" sx={{ color: '#FCF8F3' }}>
@@ -69,9 +73,11 @@ export const Navbar: React.FC = () => {
             </IconButton>
           ) : (
             <Box sx={{ marginRight: '50px' }}>
+              <Button color="inherit" component={Link} to="/slideshow" style={{ textTransform: 'none', fontSize: '20px', color: '#FCF8F3' }}>slideshow</Button>
               <Button color="inherit" component={Link} to="/upload-img" style={{ textTransform: 'none', fontSize: '20px', color: '#FCF8F3' }}>subir foto</Button>
               <Button color="inherit" component={Link} to="/take-img" style={{ textTransform: 'none', fontSize: '20px', color: '#FCF8F3' }}>sacar foto</Button>
-              <Button color="inherit" component={Link} to="/gallery" style={{ textTransform: 'none', fontSize: '20px', color: '#FCF8F3' }}>ver galería</Button>
+              <Button color="inherit" component={Link} to="/gallery" style={{ textTransform: 'none', fontSize: '20px', color: '#FCF8F3' }}>galería</Button>
+              
             </Box>
           )}
         </Toolbar>

@@ -71,3 +71,7 @@ footer {
   margin-bottom: -30px;
 }
 
+.fullscreen header,
+.fullscreen footer {
+  display: none;
+}
