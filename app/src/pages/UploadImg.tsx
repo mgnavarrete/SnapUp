@@ -97,7 +97,7 @@ const UploadImg: React.FC = () => {
     };
   
     try {
-      await axios.post('mentaflix.ddns.net:5000/upload', formData, config);
+      await axios.post('http://mentaflix.ddns.net:5000/upload', formData, config); // Usa tu dominio dinámico
     } catch (error) {
       console.error('Error subiendo las imágenes:', error);
       throw error;
