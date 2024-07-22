@@ -19,14 +19,14 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// Ruta para subir imágenes
+// Ruta para subir archivos (imágenes y videos)
 app.post('/upload', (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No se subieron archivos.');
   }
 
   const photographerName = req.body.photographerName || 'undefined';
-  const images = req.files.images;
+  const files = req.files.files; // Cambiar a "files" para aceptar múltiples tipos de archivos
   const uploadPromises = [];
 
   const saveFile = (file) => {
@@ -46,20 +46,20 @@ app.post('/upload', (req, res) => {
     });
   };
 
-  if (Array.isArray(images)) {
-    images.forEach(file => {
+  if (Array.isArray(files)) {
+    files.forEach(file => {
       uploadPromises.push(saveFile(file));
     });
   } else {
-    uploadPromises.push(saveFile(images));
+    uploadPromises.push(saveFile(files));
   }
 
   Promise.all(uploadPromises)
     .then(() => {
-      res.send('Imágenes subidas correctamente.');
+      res.send('Archivos subidos correctamente.');
     })
     .catch((err) => {
-      res.status(500).send('Error al subir las imágenes.');
+      res.status(500).send('Error al subir los archivos.');
     });
 });
 
@@ -73,6 +73,16 @@ app.get('/api/images', (req, res) => {
     }
     const images = files.filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
     res.json(images); // Asegurarse de enviar un JSON array
+  });
+});
+
+app.get('/api/videos', (req, res) => {
+  fs.readdir(uploadsDir, (err, files) => {
+    if (err) {
+      return res.status(500).send('No se pueden escanear los archivos.');
+    }
+    const videos = files.filter(file => /\.(mp4|avi|mkv|mov)$/i.test(file));
+    res.json(videos); // Asegurarse de enviar un JSON array
   });
 });
 

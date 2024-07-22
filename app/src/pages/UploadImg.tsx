@@ -34,12 +34,12 @@ const LinearProgressWithLabel: React.FC<LinearProgressWithLabelProps> = (props) 
   );
 };
 
-const UploadImg: React.FC = () => {
+const UploadFiles: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [open, setOpen] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState<string>('Las imágenes están siendo subidas, por favor espera...');
+  const [uploadMessage, setUploadMessage] = useState<string>('Los archivos están siendo subidos, por favor espera...');
   const [photographerName, setPhotographerName] = useState<string>('');
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,43 +49,41 @@ const UploadImg: React.FC = () => {
       setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
 
       const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-      setImagePreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
+      setPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
     }
   };
 
   const handleUpload = async () => {
     if (selectedFiles.length > 35) {
-      setUploadMessage('Máximo de imágenes para subir es 35.');
+      setUploadMessage('Máximo de archivos para subir es 35.');
       setOpen(true);
       return;
     }
-  
+
     if (selectedFiles.length > 0) {
       setOpen(true);
-      setUploadMessage('Subiendo Imágenes, por favor espera...');
+      setUploadMessage('Subiendo archivos, por favor espera...');
       setUploadProgress(0);
-  
+
       try {
         for (let i = 0; i < selectedFiles.length; i++) {
           await uploadFile(selectedFiles[i], i, selectedFiles.length);
         }
         setUploadProgress(100);
-        setUploadMessage('Imágenes subidas correctamente.');
+        setUploadMessage('Archivos subidos correctamente.');
         setSelectedFiles([]);
-        setImagePreviews([]);
+        setPreviews([]);
       } catch (error) {
-        setUploadMessage('Error subiendo las imágenes.');
+        setUploadMessage('Error subiendo los archivos.');
       }
     }
   };
-  
+
   const uploadFile = async (file: File, index: number, totalFiles: number) => {
     const formData = new FormData();
-    formData.append('images', file);
-    formData.append('photographerName', photographerName); // Asegúrate de que el nombre del fotógrafo se añada correctamente
-  
-    console.log("Photographer Name:", photographerName); // Agregar este log para verificar
-  
+    formData.append('files', file);
+    formData.append('photographerName', photographerName); 
+
     const config: AxiosRequestConfig = {
       headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (progressEvent: AxiosProgressEvent) => {
@@ -95,31 +93,31 @@ const UploadImg: React.FC = () => {
         }
       }
     };
-  
+
     try {
-      await axios.post('http://mentaflix.ddns.net:5000/upload', formData, config); // Usa tu dominio dinámico
+      await axios.post('http://mentaflix.ddns.net:5000/upload', formData, config);
     } catch (error) {
-      console.error('Error subiendo las imágenes:', error);
+      console.error('Error subiendo los archivos:', error);
       throw error;
     }
   };
 
   const handleClose = () => {
     setOpen(false);
-    setUploadMessage('Subiendo Imágenes, por favor espera...');
+    setUploadMessage('Subiendo archivos, por favor espera...');
     setUploadProgress(0);
   };
 
-  const handleRemoveImage = (index: number) => {
+  const handleRemoveFile = (index: number) => {
     setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-    setImagePreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
+    setPreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
   };
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', padding: { xs: 2, md: 0 } }}>
       <Box sx={{ width: '100%', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
         <Typography variant="h1" sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '40px', md: '70px' } }}>
-          Sube tus fotos
+          Sube tus archivos
         </Typography>
         <TextField
           label="Nombre Fotógrafo"
@@ -133,7 +131,7 @@ const UploadImg: React.FC = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2 }}>
-                {imagePreviews.map((preview, index) => (
+                {previews.map((preview, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -148,10 +146,14 @@ const UploadImg: React.FC = () => {
                       },
                     }}
                   >
-                    <img src={preview} alt={`preview ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {/\.(jpg|jpeg|png|gif)$/i.test(selectedFiles[index].name) ? (
+                      <img src={preview} alt={`preview ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <video src={preview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} controls />
+                    )}
                     <IconButton
                       aria-label="delete"
-                      onClick={() => handleRemoveImage(index)}
+                      onClick={() => handleRemoveFile(index)}
                       className="delete-icon"
                       sx={{
                         position: 'absolute',
@@ -172,7 +174,7 @@ const UploadImg: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                {`${selectedFiles.length} fotos cargadas`}
+                {`${selectedFiles.length} archivos cargados`}
               </Typography>
               <Button
                 component="label"
@@ -180,14 +182,14 @@ const UploadImg: React.FC = () => {
                 startIcon={<CloudUploadIcon />}
                 sx={{ marginTop: '10px', fontSize: '15px' }}
               >
-                Cargar Fotos
-                <input type="file" name="images" hidden multiple onChange={handleFileChange} />
+                Cargar Archivos
+                <input type="file" name="files" hidden multiple onChange={handleFileChange} />
               </Button>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleUpload}
-                disabled={selectedFiles.length === 0 || photographerName === ''} // Deshabilitar si no hay imágenes o nombre del fotógrafo
+                disabled={selectedFiles.length === 0 || photographerName === ''} 
                 sx={{ marginLeft: { xs: 0, md: '50px' }, marginTop: '10px', fontSize: '15px' }}
               >
                 Subir
@@ -199,7 +201,7 @@ const UploadImg: React.FC = () => {
 
       <BootstrapDialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
         <DialogTitle sx={{ m: 0, p: 2, color:'#698474' }} id="customized-dialog-title">
-          Subiendo Imágenes
+          Subiendo Archivos
           <IconButton
             aria-label="close"
             onClick={handleClose}
@@ -221,4 +223,4 @@ const UploadImg: React.FC = () => {
   );
 };
 
-export default UploadImg;
+export default UploadFiles;
