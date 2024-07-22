@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ignorar carpeta uploads y thumbnails y todo lo de su interior
+uploads
+thumbnails
+uploads/*
+thumbnails/*
+

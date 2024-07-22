@@ -119,14 +119,7 @@ const UploadFiles: React.FC = () => {
         <Typography variant="h1" sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '40px', md: '70px' } }}>
           Sube tus archivos
         </Typography>
-        <TextField
-          label="Nombre Fotógrafo"
-          margin="normal"
-          sx={{ width: { xs: '100%', md: '450px' }, marginTop: { xs: 2, md: 3 } }}
-          variant="filled"
-          value={photographerName}
-          onChange={(e) => setPhotographerName(e.target.value)}
-        />
+        
         <Box sx={{ width: '100%', marginTop: 3, textAlign: 'center' }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -173,14 +166,27 @@ const UploadFiles: React.FC = () => {
               </Box>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {`${selectedFiles.length} archivos cargados`}
-              </Typography>
+              <TextField
+            label="Nombre del Fotógrafo"
+            margin="normal"
+            sx={{ width: { xs: '100%', md: '300px' }, marginTop: { xs: 2, md: 3 }, marginBottom: 0}}
+            variant="filled"
+            value={photographerName}
+            onChange={(e) => setPhotographerName(e.target.value)}
+          />
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center'}}>
+          <Typography  margin="normal" variant="body2" sx={{width: { xs: '100%', md: '300px' }, marginTop: '0px', mb: 1, fontSize: '11px', marginBottom: '1px'}}> *Si escribes tu nombre podrás filtrar los archivos y ver las fotos que has subido.</Typography>
+            </Box>
+          </Grid>
+
+       
+    
+            <Grid item xs={12}>
               <Button
                 component="label"
                 variant="contained"
                 startIcon={<CloudUploadIcon />}
-                sx={{ marginTop: '10px', fontSize: '15px' }}
+                sx={{ marginRight: '10px', fontSize: '15px' }}
               >
                 Cargar Archivos
                 <input type="file" name="files" hidden multiple onChange={handleFileChange} />
@@ -189,11 +195,15 @@ const UploadFiles: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleUpload}
-                disabled={selectedFiles.length === 0 || photographerName === ''} 
-                sx={{ marginLeft: { xs: 0, md: '50px' }, marginTop: '10px', fontSize: '15px' }}
+                disabled={selectedFiles.length === 0} 
+                sx={{ fontSize: '15px' }}
               >
                 Subir
               </Button>
+
+              <Typography variant="body2" sx={{ marginTop: '15px', mb: 1 }}>
+                {`${selectedFiles.length} archivos cargados`}
+              </Typography>
             </Grid>
           </Grid>
         </Box>

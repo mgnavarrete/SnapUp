@@ -13,7 +13,8 @@ const theme = createTheme({
     },
     text: {
       primary: '#FCF8F3',
-      secondary: '#698474',
+      secondary: '#DCA47C',
+
     },
   },
   typography: {
@@ -67,13 +68,10 @@ const theme = createTheme({
         root: {
           backgroundColor: '#EBC2A7',
           '&:hover': {
-            backgroundColor: '#698474',
+            backgroundColor: '#5e4a33',
           },
           '&.Mui-focused': {
             backgroundColor: '#5e4a33',
-          },
-          '&.Mui-focused .MuiInputLabel-shrink': {
-            color: '#698474',
           },
         },
         input: {
@@ -84,6 +82,14 @@ const theme = createTheme({
     MuiInputLabel: {
       styleOverrides: {
         root: {
+          // Estilo base para todos los labels
+          color: '#FCF8F3',
+          '&.Mui-focused': {
+            color: '#FCF8F3',
+          },
+        },
+        // Estilos específicos para MuiFilledInput
+        filled: {
           color: '#FCF8F3',
           '&.Mui-focused': {
             color: '#FCF8F3',
@@ -92,9 +98,49 @@ const theme = createTheme({
             color: '#FCF8F3',
           },
         },
+        // Estilos específicos para MuiOutlinedInput
+        outlined: {
+          color: '#DCA47C',
+          '&.Mui-focused': {
+            color: '#DCA47C',
+          },
+          '&.MuiInputLabel-shrink': {
+            color: '#DCA47C',
+          },
+        },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#DCA47C',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#DCA47C',
+          },
+        },
+        notchedOutline: {
+          borderColor: '#DCA47C',
+        },
+        input: {
+          color: '#DCA47C',
+        },
+      },
+    },
+
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          color: '#DCA47C',
+        },
+      },
+    },
+
   },
 });
+
+
+
 
 export default theme;

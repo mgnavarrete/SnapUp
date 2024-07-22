@@ -24,6 +24,23 @@ if (!fs.existsSync(thumbnailsDir)) {
   fs.mkdirSync(thumbnailsDir);
 }
 
+// Función para formatear la fecha y hora
+const formatDateTime = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+};
+
+// Función para asegurar nombres de archivo únicos
+const getUniqueFilename = (baseName, ext) => {
+  const uniqueId = uuidv4();
+  return `${baseName}_${uniqueId}${ext}`;
+};
+
 // Ruta para subir archivos (imágenes y videos)
 app.post('/upload', (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -31,14 +48,15 @@ app.post('/upload', (req, res) => {
   }
 
   const photographerName = req.body.photographerName || 'undefined';
+  const uploadDate = formatDateTime(new Date());
+  const baseName = `${photographerName}_${uploadDate}`;
   const files = req.files.files; // Cambiar a "files" para aceptar múltiples tipos de archivos
   const uploadPromises = [];
 
   const saveFile = (file) => {
     return new Promise((resolve, reject) => {
-      const uniqueSuffix = uuidv4();
       const extension = path.extname(file.name);
-      const filename = `${photographerName}_${uniqueSuffix}${extension}`;
+      const filename = getUniqueFilename(baseName, extension);
       const filepath = path.join(uploadsDir, filename);
 
       file.mv(filepath, (err) => {
@@ -46,11 +64,11 @@ app.post('/upload', (req, res) => {
           reject(err);
         } else {
           if (/\.(mp4|avi|mkv|mov)$/i.test(filename)) {
-            const thumbnailPath = path.join(thumbnailsDir, `${photographerName}_${uniqueSuffix}.jpg`);
+            const thumbnailFilename = filename.replace(extension, '.jpg');
             ffmpeg(filepath)
               .screenshots({
                 timestamps: ['50%'],
-                filename: `${photographerName}_${uniqueSuffix}.jpg`,
+                filename: thumbnailFilename,
                 folder: thumbnailsDir,
                 size: '320x240'
               })

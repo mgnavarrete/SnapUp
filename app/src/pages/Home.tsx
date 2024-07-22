@@ -39,15 +39,6 @@ const Home: React.FC = () => {
             </Button>
           </Grid>
           <Grid item>
-            <Button
-              component={Link}
-              to="/take-img"
-              variant="contained"
-              color="primary"
-              sx={{ fontSize: { xs: '16px', md: '20px' } }}
-            >
-              Sacar Foto
-            </Button>
           </Grid>
         </Grid>
       </Grid>

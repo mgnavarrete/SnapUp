@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Home from './pages/Home';
 import Gallery from './pages/Gallery';
-import ImgDisplay from './pages/ImgDisplay';
+import MediaDisplay from './pages/MediaDisplay';
 import TakeImg from './pages/TakeImg';
 import UploadImg from './pages/UploadImg';
 import Slideshow from './pages/Slideshow';
@@ -38,7 +38,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/gallery" element={<Gallery />} />
-              <Route path="/img-display/:imageSrc" element={<ImgDisplay />} />
+              <Route path="/media-display/:mediaSrc" element={<MediaDisplay />} />
               <Route path="/take-img" element={<TakeImg />} />
               <Route path="/upload-img" element={<UploadImg />} />
               <Route path="/slideshow" element={<Slideshow setIsFullscreen={setIsFullscreen} />} />
