@@ -6,72 +6,71 @@ import exifr from 'exifr';
 
 const ITEMS_PER_PAGE = 28;
 
-interface ImageData {
+interface MediaData {
   src: string;
   photographer: string;
   date: string;
   time: string;
+  type: 'image' | 'video';
 }
 
 const Gallery: React.FC = () => {
-  const [images, setImages] = useState<ImageData[]>([]);
+  const [media, setMedia] = useState<MediaData[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [photographer, setPhotographer] = useState<string>('');
   const [searching, setSearching] = useState<boolean>(false);
-  const [filteredImages, setFilteredImages] = useState<ImageData[]>([]);
+  const [filteredMedia, setFilteredMedia] = useState<MediaData[]>([]);
   const [transitioning, setTransitioning] = useState<boolean>(false);
-  const [showImages, setShowImages] = useState<boolean>(true);
+  const [showMedia, setShowMedia] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchImages();
+    fetchMedia();
   }, []);
 
   useEffect(() => {
-    filterImages(images, photographer);
-  }, [images, photographer]);
+    filterMedia(media, photographer);
+  }, [media, photographer]);
 
   useEffect(() => {
     if (transitioning) {
       const timer = setTimeout(() => {
         setTransitioning(false);
-        setShowImages(true);
+        setShowMedia(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
   }, [transitioning]);
 
-  const fetchImages = () => {
+  const fetchMedia = async () => {
     setSearching(true);
-    axios.get('/api/images')
-      .then(async response => {
-        if (Array.isArray(response.data)) {
-          const imageDataPromises = response.data.map(async (image: string) => {
-            const photographerName = image.split('_')[0];
-            const { date, time } = await fetchImageDateTime(`/uploads/${image}`);
-            console.log(`Image: ${image}, Photographer: ${photographerName}, Date: ${date}, Time: ${time}`);
-            return { src: image, photographer: photographerName, date, time };
-          });
-          const imageData = await Promise.all(imageDataPromises);
-          setImages(imageData);
-        } else {
-          console.error('La respuesta del servidor no es un array:', response.data);
-        }
-      })
-      .catch(error => {
-        console.error('Hubo un error al obtener las imágenes!', error);
-      })
-      .finally(() => {
-        setSearching(false);
-      });
+    try {
+      const response = await axios.get<string[]>('/api/media');
+      if (Array.isArray(response.data)) {
+        const mediaDataPromises: Promise<MediaData>[] = response.data.map(async (item: string): Promise<MediaData> => {
+          const photographerName = item.split('_')[0];
+          const { date, time } = await fetchMediaDateTime(`/uploads/${item}`);
+          const type = /\.(jpg|jpeg|png|gif)$/i.test(item) ? 'image' : 'video';
+          return { src: item, photographer: photographerName, date, time, type };
+        });
+        const mediaData = await Promise.all(mediaDataPromises);
+        setMedia(mediaData);
+      } else {
+        console.error('La respuesta del servidor no es un array:', response.data);
+      }
+    } catch (error) {
+      console.error('Hubo un error al obtener los medios!', error);
+    } finally {
+      setSearching(false);
+    }
   };
 
-  const fetchImageDateTime = async (imageSrc: string): Promise<{ date: string; time: string }> => {
+  const fetchMediaDateTime = async (mediaSrc: string): Promise<{ date: string; time: string }> => {
     try {
-      const response = await fetch(imageSrc);
-      const img = await response.blob();
-      const exifData = await exifr.parse(img);
+      const response = await fetch(mediaSrc);
+      const mediaBlob = await response.blob();
+      const exifData = await exifr.parse(mediaBlob);
       const modificationDate = response.headers.get('last-modified');
       console.log('EXIF Data:', exifData);
       console.log('Modification Date:', modificationDate);
@@ -97,39 +96,39 @@ const Gallery: React.FC = () => {
     }
   };
 
-  const filterImages = (images: ImageData[], photographer: string) => {
+  const filterMedia = (media: MediaData[], photographer: string) => {
     const photographerLowerCase = photographer.toLowerCase();
-    const filtered = images.filter(image => {
-      return photographer === '' || image.photographer.toLowerCase().startsWith(photographerLowerCase);
+    const filtered = media.filter(item => {
+      return photographer === '' || item.photographer.toLowerCase().startsWith(photographerLowerCase);
     });
     setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
     setPage(1);
-    setShowImages(false);
+    setShowMedia(false);
     setTransitioning(true);
     setTimeout(() => {
-      setFilteredImages(filtered);
+      setFilteredMedia(filtered);
     }, 400);
   };
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
-    setShowImages(false);
+    setShowMedia(false);
     setTransitioning(true);
     setPage(value);
     window.scrollTo(0, 0);
   };
 
-  const handleImageClick = (image: string) => {
-    navigate(`/img-display/${image}`);
+  const handleMediaClick = (src: string, type: 'image' | 'video') => {
+    navigate(`/media-display/${type}/${src}`);
   };
 
   const handlePhotographerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPhotographer(event.target.value);
   };
 
-  const getCurrentPageImages = () => {
+  const getCurrentPageMedia = () => {
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredImages.slice(startIndex, endIndex);
+    return filteredMedia.slice(startIndex, endIndex);
   };
 
   return (
@@ -150,13 +149,13 @@ const Gallery: React.FC = () => {
       ) : (
         <>
           <Box sx={{ width: '100%', height: 'auto', overflowY: 'hidden', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-            {filteredImages.length === 0 ? (
+            {filteredMedia.length === 0 ? (
               <Typography variant="h6" sx={{ textAlign: 'center', mt: 4 }}>
-                No hay imágenes de ese fotógrafo
+                No hay archivos de ese fotógrafo
               </Typography>
             ) : (
-              getCurrentPageImages().map((image, index) => (
-                <Grow in={showImages} key={index} timeout={400}>
+              getCurrentPageMedia().map((item, index) => (
+                <Grow in={showMedia} key={index} timeout={400}>
                   <Card
                     sx={{
                       width: { xs: 'calc(50% - 5px)', sm: 'calc(33.33% - 5px)', md: 'calc(25% - 5px)' },
@@ -167,24 +166,34 @@ const Gallery: React.FC = () => {
                       opacity: transitioning ? 0 : 1,
                       transition: 'opacity 1s ease-in-out',
                     }}
-                    onClick={() => handleImageClick(image.src)}
+                    onClick={() => handleMediaClick(item.src, item.type)}
                   >
                     <CardActionArea>
-                      <CardMedia
-                        component="img"
-                        height="200"
-                        image={`/uploads/${image.src}`}
-                        alt={image.src}
-                        loading="lazy"
-                        sx={{ objectFit: 'cover' }}
-                      />
+                      {item.type === 'image' ? (
+                        <CardMedia
+                          component="img"
+                          height="200"
+                          image={`/uploads/${item.src}`}
+                          alt={item.src}
+                          loading="lazy"
+                          sx={{ objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <CardMedia
+                          component="video"
+                          height="200"
+                          src={`/uploads/${item.src}`}
+                          controls
+                          sx={{ objectFit: 'cover' }}
+                        />
+                      )}
                       <CardContent sx={{ padding: '8px' }}>
                         <Typography variant="body2" sx={{ fontSize: '0.8rem', textAlign: 'left', color: '#DCA47C' }}>
-                          <strong>Fotógrafo:</strong> <em>{image.photographer}</em>
+                          <strong>Fotógrafo:</strong> <em>{item.photographer}</em>
                           <br />
-                          <strong>Fecha:</strong> <em>{image.date}</em>
+                          <strong>Fecha:</strong> <em>{item.date}</em>
                           <br />
-                          <strong>Hora:</strong> <em>{image.time}</em>
+                          <strong>Hora:</strong> <em>{item.time}</em>
                         </Typography>
                       </CardContent>
                     </CardActionArea>
@@ -193,7 +202,7 @@ const Gallery: React.FC = () => {
               ))
             )}
           </Box>
-          {filteredImages.length > 0 && (
+          {filteredMedia.length > 0 && (
             <Pagination
               count={totalPages}
               page={page}

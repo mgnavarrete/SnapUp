@@ -86,6 +86,18 @@ app.get('/api/videos', (req, res) => {
   });
 });
 
+app.get('/api/media', async (req, res) => {
+  try {
+    const files = await fs.promises.readdir(uploadsDir);
+    const images = files.filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
+    const videos = files.filter(file => /\.(mp4|avi|mkv|mov)$/i.test(file));
+    const media = [...images, ...videos];
+    res.json(media); // Asegurarse de enviar un JSON array
+  } catch (err) {
+    res.status(500).send('No se pueden escanear los archivos.');
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
