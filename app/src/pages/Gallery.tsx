@@ -180,10 +180,11 @@ const Gallery: React.FC = () => {
                         />
                       ) : (
                         <CardMedia
-                          component="video"
+                          component="img"
                           height="200"
-                          src={`/uploads/${item.src}`}
-                          controls
+                          image={`/thumbnails/${item.src.replace(/\.[^/.]+$/, ".jpg")}`} // Usar la imagen de miniatura correspondiente al video
+                          alt={item.src}
+                          loading="lazy"
                           sx={{ objectFit: 'cover' }}
                         />
                       )}

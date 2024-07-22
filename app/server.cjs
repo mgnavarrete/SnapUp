@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const ffmpeg = require('fluent-ffmpeg');
 
 const app = express();
 const PORT = 5000;
@@ -13,10 +14,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 
-// Crear carpeta de uploads si no existe
+// Crear carpeta de uploads y thumbnails si no existen
 const uploadsDir = path.join(__dirname, 'uploads');
+const thumbnailsDir = path.join(__dirname, 'thumbnails');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
+}
+if (!fs.existsSync(thumbnailsDir)) {
+  fs.mkdirSync(thumbnailsDir);
 }
 
 // Ruta para subir archivos (imágenes y videos)
@@ -40,7 +45,24 @@ app.post('/upload', (req, res) => {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          if (/\.(mp4|avi|mkv|mov)$/i.test(filename)) {
+            const thumbnailPath = path.join(thumbnailsDir, `${photographerName}_${uniqueSuffix}.jpg`);
+            ffmpeg(filepath)
+              .screenshots({
+                timestamps: ['50%'],
+                filename: `${photographerName}_${uniqueSuffix}.jpg`,
+                folder: thumbnailsDir,
+                size: '320x240'
+              })
+              .on('end', () => {
+                resolve();
+              })
+              .on('error', (err) => {
+                reject(err);
+              });
+          } else {
+            resolve();
+          }
         }
       });
     });
@@ -63,8 +85,9 @@ app.post('/upload', (req, res) => {
     });
 });
 
-// Servir archivos estáticos desde la carpeta 'uploads'
+// Servir archivos estáticos desde las carpetas 'uploads' y 'thumbnails'
 app.use('/uploads', express.static(uploadsDir));
+app.use('/thumbnails', express.static(thumbnailsDir));
 
 app.get('/api/images', (req, res) => {
   fs.readdir(uploadsDir, (err, files) => {
